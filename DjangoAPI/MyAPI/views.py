@@ -38,10 +38,13 @@ def ohevalue(df):
 # @api_view(["POST"])
 def approvereject(unit):
 	try:
-		mdl = load_model("C:/Users/Ritik/Desktop/Machine Learning Practice/Bank Loan Classification/DjangoAPI/MyAPI/models/model.h5")
-		scalers = joblib.load("C:/Users/Ritik/Desktop/Machine Learning Practice/Bank Loan Classification/DjangoAPI/MyAPI/models/scalers.pkl")
-		X = scalers.transform(unit)
-		y_pred = mdl.predict(X)
+		X = MyapiConfig.scalers.transform(unit)
+
+		with MyapiConfig.model_graph.as_default():
+			with MyapiConfig.tf_session.as_default():
+				y_pred = MyapiConfig.mdl.predict(X)
+
+
 		y_pred = (y_pred>0.58)
 		newdf = pd.DataFrame(y_pred, columns=['Status'])
 		newdf = newdf.replace({True:'Approved', False:'Rejected'})
